@@ -104,7 +104,7 @@ namespace WpfApp2
                     if (lreq)
                     {
                         isLoggedIn = true;
-                        await Console.Out.WriteLineAsync("Logged in!");
+                        Console.Out.WriteLine("Logged in!");
                     }
                 }
 
@@ -135,7 +135,8 @@ namespace WpfApp2
                 parsed_data = data;
             }
 
-            var hash = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(DateTime.Now.ToString()));
+            var hash = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(""));
+            Console.Out.WriteLine(BitConverter.ToString(hash).Replace("-", ""));
             var bout = new byte[Encoding.UTF8.GetBytes(SIG_KEY_VERSION).Length + Encoding.UTF8.GetBytes(data).Length + hash.Length];
             Encoding.UTF8.GetBytes(SIG_KEY_VERSION).CopyTo(bout, 0);
             Encoding.UTF8.GetBytes(data).CopyTo(bout, Encoding.UTF8.GetBytes(SIG_KEY_VERSION).Length);

@@ -1,0 +1,23 @@
+﻿<Application x:Class="WpfApp2.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WpfApp2"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Indigo.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Pink.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+            <GradientStopCollection x:Key="InstagramGradient">
+                <GradientStop Color="#FFF6BC4D"/>
+                <GradientStop Color="#FF373EE7" Offset="1"/>
+                <GradientStop Color="#FFD72052" Offset="0.54"/>
+            </GradientStopCollection>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

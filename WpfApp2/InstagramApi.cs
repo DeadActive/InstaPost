@@ -99,7 +99,7 @@ namespace WpfApp2
                         {"password", this.password },
                         {"login_attempt_count", "0" }
                         };
-
+                    var gs = generateSignature(JsonConvert.SerializeObject(data));
                     bool lreq = await SendRequest("accounts/login/", generateSignature(JsonConvert.SerializeObject(data)), true);
                     if (lreq)
                     {
@@ -135,14 +135,30 @@ namespace WpfApp2
                 parsed_data = data;
             }
 
-            var hash = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(""));
-            Console.Out.WriteLine(BitConverter.ToString(hash).Replace("-", ""));
-            var bout = new byte[Encoding.UTF8.GetBytes(SIG_KEY_VERSION).Length + Encoding.UTF8.GetBytes(data).Length + hash.Length];
-            Encoding.UTF8.GetBytes(SIG_KEY_VERSION).CopyTo(bout, 0);
-            Encoding.UTF8.GetBytes(data).CopyTo(bout, Encoding.UTF8.GetBytes(SIG_KEY_VERSION).Length);
-            hash.CopyTo(bout, Encoding.UTF8.GetBytes(SIG_KEY_VERSION).Length + Encoding.UTF8.GetBytes(data).Length);
+            return "ig_sig_key_version=" + SIG_KEY_VERSION + "&signed_body=" + CalcHMACSHA256Hash(HexDecode(IG_SIG_KEY),data) + "." + parsed_data;
+        }
 
-            return "ig_sig_key_version=" + SIG_KEY_VERSION + "&signed_body=" + BitConverter.ToString(HMAC.Create().ComputeHash(bout)).Replace("-", "").ToLower() + "." + parsed_data;
+        private string HexDecode(string hex)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i <= hex.Length - 2; i += 2)
+            {
+                sb.Append(Convert.ToString(Convert.ToChar(Int32.Parse(hex.Substring(i, 2), System.Globalization.NumberStyles.HexNumber))));
+            }
+            return sb.ToString();
+        }
+
+        private string CalcHMACSHA256Hash(string plaintext, string salt)
+        {
+            string result = "";
+            var enc = Encoding.Default;
+            byte[]
+            baText2BeHashed = enc.GetBytes(plaintext),
+            baSalt = enc.GetBytes(salt);
+            System.Security.Cryptography.HMACSHA256 hasher = new HMACSHA256(baSalt);
+            byte[] baHashedText = hasher.ComputeHash(baText2BeHashed);
+            result = string.Join("", baHashedText.ToList().Select(b => b.ToString("x2")).ToArray());
+            return result;
         }
 
         private string generateDeviceId(string seed)
@@ -164,6 +180,9 @@ namespace WpfApp2
                 throw new Exception("Not logged in!\n");
 
             HttpResponseMessage response;
+            http.DefaultRequestHeaders.Connection.Add("close");
+            http.DefaultRequestHeaders.AcceptLanguage.Add(new System.Net.Http.Headers.StringWithQualityHeaderValue("en-US"));
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(USER_AGENT);
 
             while (true)
             {
@@ -171,7 +190,11 @@ namespace WpfApp2
                 {
                     try
                     {
-                        response = await http.PostAsync(API_URL + endpoint, new StringContent(post));
+                        await Console.Out.WriteLineAsync("POST: " + post);
+                        var sc = new StringContent(post);
+                        sc.Headers.ContentType.MediaType = "application/x-www-form-urlencoded";
+                        sc.Headers.ContentType.CharSet = "utf-8";
+                        response = await http.PostAsync(API_URL + endpoint, sc);
                     }
                     catch(ArgumentNullException)
                     {

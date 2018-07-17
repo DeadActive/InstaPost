@@ -35,6 +35,9 @@
 						<TextBlock Name="usernameid_label" Grid.Row="1" TextAlignment="Left" FontFamily="/WpfApp2;component/Resources/#Dosis" FontSize="14" Foreground="Gray">
 							username_id
 						</TextBlock>
+						<Button Name="logout_button" Grid.Row="2" Margin="0,15" Click="logout_button_Click">
+							Logout
+						</Button>
 					</Grid>
 				</Grid>
 			</materialDesign:Card>

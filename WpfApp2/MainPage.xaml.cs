@@ -21,6 +21,7 @@ namespace WpfApp2
     public partial class MainPage : UserControl
     {
         private InstagramApi api;
+        private MainWindow mw = (MainWindow)Application.Current.MainWindow;
 
         public MainPage()
         {
@@ -43,6 +44,12 @@ namespace WpfApp2
         {
             username_label.Text = "Username: " + api.getUsername;
             usernameid_label.Text = "ID: " + api.getUsernameID;
+        }
+
+        private void logout_button_Click(object sender, RoutedEventArgs e)
+        {
+            api.logout();
+            mw.transitionerIndex = 0;
         }
     }
 }

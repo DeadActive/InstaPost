@@ -237,6 +237,27 @@ namespace WpfApp2
             return await SendRequest("news/inbox/?");
         }
 
+        public async Task<bool> logout()
+        {
+            return await SendRequest("accounts/logout/");
+        }
+
+        //public async Task<bool> uploadPhoto(string photo, string caption = "", string upload_id = "", bool is_sidecar = false)
+        //{
+        //    if (string.IsNullOrEmpty(upload_id))
+        //        upload_id = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds.ToString();
+        //    Console.Out.WriteLine("upload photo, id = ", upload_id);
+
+        //    Dictionary<string, string> data = new Dictionary<string, string>()
+        //    {
+        //        {"upload_id", upload_id },
+        //        {"_uuid" , this.uuid},
+        //        {"_csrftoken" this.token},
+        //        {"image_compression","{\"lib_name\":\"jt\",\"lib_version\":\"1.3.0\",\"quality\":\"87\"}" },
+        //        {"photo", "" }
+        //    }
+        //}
+
         public async Task<bool> removeProfilePicture()
         {
             Dictionary<string, string> data = new Dictionary<string, string>()

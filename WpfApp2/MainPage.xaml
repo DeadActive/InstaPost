@@ -1,0 +1,43 @@
+﻿<UserControl x:Name="mainPage" x:Class="WpfApp2.MainPage"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp2"
+             mc:Ignorable="d"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+             d:DesignHeight="450" d:DesignWidth="800">
+	<materialDesign:TransitioningContent OpeningEffect="ExpandIn">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<materialDesign:Card x:Name="mainCard" Padding="32" Grid.Row="0" Margin="16,16,16,0">
+				<Grid VerticalAlignment="Top">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+					</Grid.RowDefinitions>
+
+					<Grid Grid.Row="0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="auto" />
+							<RowDefinition Height="auto" />
+							<RowDefinition Height="auto" />
+						</Grid.RowDefinitions>
+
+						<TextBlock Name="username_label" Grid.Row="0" TextAlignment="Left" FontFamily="/WpfApp2;component/Resources/#Dosis" FontSize="14">
+							username
+						</TextBlock>
+						<TextBlock Name="usernameid_label" Grid.Row="1" TextAlignment="Left" FontFamily="/WpfApp2;component/Resources/#Dosis" FontSize="14" Foreground="Gray">
+							username_id
+						</TextBlock>
+					</Grid>
+				</Grid>
+			</materialDesign:Card>
+		</Grid>
+	</materialDesign:TransitioningContent>
+</UserControl>

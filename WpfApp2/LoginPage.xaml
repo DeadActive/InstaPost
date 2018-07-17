@@ -11,11 +11,12 @@
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              d:DesignHeight="450" d:DesignWidth="800">
-    <materialDesign:TransitioningContent OpeningEffect="ExpandIn">
-    <Grid VerticalAlignment="Stretch">
-        <Grid.RowDefinitions>
+	<materialDesign:TransitioningContent OpeningEffect="ExpandIn">
+		<Grid VerticalAlignment="Stretch">
+			<Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+		
         <materialDesign:Card x:Name="loginCard" Padding="32" Grid.Row="0" Margin="16,32,16,0">
             <Grid VerticalAlignment="Top">
                 <Grid.RowDefinitions>

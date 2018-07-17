@@ -10,12 +10,33 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Title="InstaPost" Height="586.79" Width="394.941" ResizeMode="NoResize">
+        Title="InstaPost" Height="586.79" Width="394.941">
     <Window.Background>
         <ImageBrush ImageSource="Resources/instaback.jpg" Stretch="UniformToFill"/>
     </Window.Background>
     <Grid>
-        <materialDesign:Transitioner SelectedIndex="0" AutoApplyTransitionOrigins="True">
+		<materialDesign:DialogHost Name="login_error_dialog"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   IsEnabled="True"
+								   >
+			<materialDesign:DialogHost.DialogContent>
+				<StackPanel Margin="16">
+					<Viewbox Width="48" Height="48">
+						<Canvas Width="24" Height="24">
+							<Path Data="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" Fill="Black" />
+						</Canvas>
+					</Viewbox>
+					<TextBox>Wrong username or password!</TextBox>
+					<Button Style="{StaticResource MaterialDesignFlatButton}"
+							Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"	 
+							Click="Button_Click">
+						OK
+					</Button>
+				</StackPanel>
+			</materialDesign:DialogHost.DialogContent>
+		</materialDesign:DialogHost>
+		<materialDesign:Transitioner Name="Transitioner"  SelectedIndex="0" AutoApplyTransitionOrigins="True">
             <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}">
                 <local:LoginPage />
             </materialDesign:TransitionerSlide>
@@ -25,6 +46,12 @@
                 </materialDesign:TransitionerSlide.BackwardWipe>
                 <local:LoadingPage />
             </materialDesign:TransitionerSlide>
+			<materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect SlideInFromTop}">
+				<materialDesign:TransitionerSlide.BackwardWipe>
+					<materialDesign:SlideOutWipe/>
+				</materialDesign:TransitionerSlide.BackwardWipe>
+				<local:MainPage x:Name="mPage"/>
+			</materialDesign:TransitionerSlide>
         </materialDesign:Transitioner>
     </Grid>
 </Window>

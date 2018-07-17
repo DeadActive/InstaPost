@@ -13,16 +13,49 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace WpfApp2
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
+    /// 
+
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        public object transitionerIndex
+        {
+            get
+            {
+                return Transitioner.SelectedIndex;
+            }
+            set
+            {
+                Transitioner.SelectedIndex = (int)value;
+            }
+        }
+
+        public object getMainPage
+        {
+            get
+            {
+                return mPage;
+            }
+        }
+
+        public async void showLoginWarning()
+        {
+            //await MaterialDesignThemes.Wpf.DialogHost.Show(login_error_dialog.Content);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Console.Out.WriteLine("closing");
         }
     }
 }

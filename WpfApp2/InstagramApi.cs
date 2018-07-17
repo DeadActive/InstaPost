@@ -46,7 +46,6 @@ namespace WpfApp2
         private string password;
         private string device_id;
         private string uuid;
-        private bool isLoggedIn;
         private HttpWebRequest req;
         private readonly HttpClient http;
         private HttpClientHandler handler;
@@ -54,7 +53,16 @@ namespace WpfApp2
         private CookieCollection resposeCookies;
         private HttpResponseMessage lastResponse;
         private JObject lastJson;
-       
+
+        private bool isLoggedIn;
+        private string username_id;
+        private string rank_token;
+        private string token;
+
+        //public section
+        public bool loggedIn = false;
+        public bool fail = false;
+
         public InstagramApi(string username, string password, bool Debug = false)
         {
             var m = MD5.Create();
@@ -82,6 +90,65 @@ namespace WpfApp2
             this.uuid = generateUUID(true);
         }
 
+        public async void relogin(int attempt, bool force = false)
+        {
+            if (!this.isLoggedIn || force)
+            {
+                bool req = await SendRequest("si/fetch_headers/?challenge_type=signup&guid=" + generateUUID(false), null, true);
+                if (req)
+                {
+                    Dictionary<string, string> data = new Dictionary<string, string>()
+                        {
+                        {"phone_id", generateUUID(true) },
+                        {"_csrftoken", resposeCookies["csrftoken"].Value},
+                        {"username", this.username },
+                        {"guid", this.uuid },
+                        {"device_id", this.device_id},
+                        {"password", this.password },
+                        {"login_attempt_count", string.Format("{0}", attempt)}
+                        };
+                    var gs = generateSignature(JsonConvert.SerializeObject(data));
+                    bool lreq = await SendRequest("accounts/login/", generateSignature(JsonConvert.SerializeObject(data)), true);
+                    if (lreq)
+                    {
+                        isLoggedIn = true;
+                        fail = false;
+                        this.username_id = lastJson["logged_in_user"]["pk"].ToString();
+                        this.rank_token = this.username_id + "_" + this.uuid;
+                        this.token = resposeCookies["csrftoken"].Value; //5744828632
+                        Console.Out.WriteLine("username_id:{0}\nrank_token:{1}\ntoken:{2}", username_id, rank_token, token);
+
+                        await syncFeatures();
+                        await autoCompleteUserList();
+                        await timelineFeed();
+                        await getv2Inbox();
+                        await getRecentActivity();
+
+                        loggedIn = true;
+                        Console.Out.WriteLine("Logged in!");
+                    }
+                    else
+                    {
+                        if (lastResponse.StatusCode == (HttpStatusCode)400)
+                        {
+                            if (attempt < 3)
+                            {
+                                Console.Out.WriteLine("Relogin {0} time...", attempt);
+                                await Task.Delay(500);
+                                relogin(attempt + 1);
+                            }
+                            else
+                                return;
+                        }
+
+                        fail = true;
+                        loggedIn = false;
+                    }
+                }
+
+            }
+        }
+
         public async void login(bool force = false)
         {
             if(!this.isLoggedIn || force)
@@ -104,15 +171,84 @@ namespace WpfApp2
                     if (lreq)
                     {
                         isLoggedIn = true;
+                        fail = false;
+                        this.username_id = lastJson["logged_in_user"]["pk"].ToString();
+                        this.rank_token = this.username_id + "_" + this.uuid;
+                        this.token = resposeCookies["csrftoken"].Value; //5744828632
+                        Console.Out.WriteLine("username_id:{0}\nrank_token:{1}\ntoken:{2}", username_id, rank_token, token);
+
+                        await syncFeatures();
+                        await autoCompleteUserList();
+                        await timelineFeed();
+                        await getv2Inbox();
+                        await getRecentActivity();
+
+                        loggedIn = true;
                         Console.Out.WriteLine("Logged in!");
                     }
-                }
+                    else
+                    {
+                        if(lastResponse.StatusCode == (HttpStatusCode)400)
+                        {
+                            Console.Out.WriteLine("Relogin...");
+                            await Task.Delay(500);
+                            relogin(1);
+                        }
 
+                        fail = true;
+                        loggedIn = false;
+                    }
+                }
 
             }
 
         }
 
+        public async Task<bool> syncFeatures()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>()
+            {
+                {"_uuid", this.uuid },
+                {"_uid", this.username_id },
+                {"id", this.username_id },
+                {"_csrftoken", this.token },
+                {"experiments", EXPERIMENTS }
+            };
+            return await SendRequest("qe/sync/", generateSignature(JsonConvert.SerializeObject(data)));
+        }
+
+        public async Task<bool> autoCompleteUserList()
+        {
+            return await SendRequest("friendships/autocomplete_user_list/");
+        }
+
+        public async Task<bool> timelineFeed()
+        {
+            return await SendRequest("feed/timeline/");
+        }
+
+        public async Task<bool> getv2Inbox()
+        {
+            return await SendRequest("direct_v2/inbox/?");
+        }
+
+        public async Task<bool> getRecentActivity()
+        {
+            return await SendRequest("news/inbox/?");
+        }
+
+        public async Task<bool> removeProfilePicture()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>()
+            {
+                { "_uuid", this.uuid },
+                { "_uid", this.username_id },
+                {"_csrftoken", this.token }
+            };
+            return await SendRequest("accounts/remove_profile_picture/", generateSignature(JsonConvert.SerializeObject(data)));
+        }
+
+        //utils functions
         private string generateUUID(bool type)
         {
             var generated_uuid = System.Guid.NewGuid().ToString();
@@ -198,7 +334,7 @@ namespace WpfApp2
                     }
                     catch(ArgumentNullException)
                     {
-                        await Console.Out.WriteLineAsync("GET");
+                        await Console.Out.WriteLineAsync("GET: " + endpoint);
                         response = await http.GetAsync(API_URL + endpoint);
                     }
                     break;
@@ -213,15 +349,45 @@ namespace WpfApp2
             if(response.StatusCode == HttpStatusCode.OK)
             {
                 this.lastResponse = response;
+                string ljson = await response.Content.ReadAsStringAsync();
+                this.lastJson = JObject.Parse(ljson);
                 Uri uri = new Uri(API_URL + endpoint);
                 this.resposeCookies = cookies.GetCookies(uri);
                 //this.lastJson = new JObject(response.Content.ToString());
                 return true;
             }
+            //if(response.StatusCode == (HttpStatusCode)429)
+            //{
+            //    Console.Out.WriteLine("Too many requests. Delay 5s\n");
+            //    await Task.Delay(5000);
+            //    return await SendRequest(endpoint, post, login);
+            //}
             else
             {
                 await Console.Out.WriteLineAsync("Request return " + response.StatusCode.ToString() + " error!");
+                this.lastResponse = response;
+                string ljson = await response.Content.ReadAsStringAsync();
+                this.lastJson = JObject.Parse(ljson);
+                Uri uri = new Uri(API_URL + endpoint);
+                this.resposeCookies = cookies.GetCookies(uri);
                 return false;
+            }
+        }
+
+        //get-set
+        public string getUsername
+        {
+            get
+            {
+                return this.username;
+            }
+        }
+
+        public string getUsernameID
+        {
+            get
+            {
+                return this.username_id;
             }
         }
     }

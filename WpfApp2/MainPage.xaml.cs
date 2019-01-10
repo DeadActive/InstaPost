@@ -44,6 +44,9 @@ namespace WpfApp2
         {
             username_label.Text = "Username: " + api.getUsername;
             usernameid_label.Text = "ID: " + api.getUsernameID;
+            api.getSelfUserFollowers();
+            System.Console.WriteLine(api.LastJson.Count);
+            
         }
 
         private void logout_button_Click(object sender, RoutedEventArgs e)

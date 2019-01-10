@@ -48,8 +48,14 @@ namespace WpfApp2
             }
         }
 
-        public async void showLoginWarning()
+        public void Enqueue(string msg)
         {
+            snackbar.MessageQueue.Enqueue(msg);
+        }
+
+        public async void ShowLoginWarning()
+        {
+            
             //await MaterialDesignThemes.Wpf.DialogHost.Show(login_error_dialog.Content);
         }
 

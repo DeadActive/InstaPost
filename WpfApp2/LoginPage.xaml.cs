@@ -23,10 +23,13 @@ namespace WpfApp2
         private InstagramApi api;
         private MainWindow mw = (MainWindow)Application.Current.MainWindow;
         private System.Windows.Threading.DispatcherTimer loginTimer = new System.Windows.Threading.DispatcherTimer();
+        private MaterialDesignThemes.Wpf.SnackbarMessageQueue smq;
+        private int fails = 0;
 
         public LoginPage()
         {
             InitializeComponent();
+            
         }
 
         private void InitLoginTimer()
@@ -40,16 +43,20 @@ namespace WpfApp2
         {
             if (api.loggedIn)
             {
+                fails = 0;
                 loginTimer.Stop();
                 mw.transitionerIndex = 2;
                 MainPage mp = (MainPage)mw.getMainPage;
                 mp.API = api;
                 mp.InitializeApiVars();
+                mw.Enqueue("Login succesfully!");
             }
             else if(api.fail)
             {
+                fails++;
                 mw.transitionerIndex = 0;
-                mw.showLoginWarning();
+                if(fails < 2)
+                    mw.Enqueue("Can't login!");
             }
         }
 
@@ -58,6 +65,7 @@ namespace WpfApp2
             api = new InstagramApi(usernameBox.Text, passwordBox.Password);
             InitLoginTimer();
             api.login();
+            fails = 0;
         }
     }
 }

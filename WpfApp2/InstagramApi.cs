@@ -180,7 +180,7 @@ namespace WpfApp2
                         await syncFeatures();
                         await autoCompleteUserList();
                         await timelineFeed();
-                        await getv2Inbox();
+                        //await getv2Inbox();
                         await getRecentActivity();
 
                         loggedIn = true;
@@ -237,6 +237,19 @@ namespace WpfApp2
             return await SendRequest("news/inbox/?");
         }
 
+        public async Task<bool> getUserFollowers(string usernameId, string maxid = "")
+        {
+            if (maxid == "")
+                return await SendRequest("friendships/" + usernameId + "/followers/?rank_token=" + rank_token);
+            else
+                return await SendRequest("friendships/" + usernameId + "/followers/?rank_token=" + rank_token + "&max_id=" + maxid);
+        }
+
+        public async Task<bool> getSelfUserFollowers()
+        {
+            return await getUserFollowers(username_id);
+        }
+
         public async Task<bool> logout()
         {
             return await SendRequest("accounts/logout/");
@@ -252,10 +265,21 @@ namespace WpfApp2
         //    {
         //        {"upload_id", upload_id },
         //        {"_uuid" , this.uuid},
-        //        {"_csrftoken" this.token},
+        //        {"_csrftoken", this.token},
         //        {"image_compression","{\"lib_name\":\"jt\",\"lib_version\":\"1.3.0\",\"quality\":\"87\"}" },
         //        {"photo", "" }
-        //    }
+        //    };
+        //    if (is_sidecar)
+        //        data["is_sidecar"] = "1";
+        //    http.DefaultRequestHeaders.Add("X-IG-Connection-Type", "WIFI");
+        //    http.DefaultRequestHeaders.Add("X-IG-Capabilities", "3Q4=");
+        //    http.DefaultRequestHeaders.Add("Cookie2", "$Version=1");
+        //    http.DefaultRequestHeaders.Add("Accept-Language", "en-US");
+        //    http.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
+        //    http.DefaultRequestHeaders.Add("Content-type", "image");
+        //    http.DefaultRequestHeaders.Add("Connection", "close");
+        //    http.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+           
         //}
 
         public async Task<bool> removeProfilePicture()
@@ -411,5 +435,7 @@ namespace WpfApp2
                 return this.username_id;
             }
         }
+
+        public JObject LastJson { get => lastJson; set => lastJson = value; }
     }
 }

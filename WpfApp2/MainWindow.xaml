@@ -14,28 +14,7 @@
     <Window.Background>
         <ImageBrush ImageSource="Resources/instaback.jpg" Stretch="UniformToFill"/>
     </Window.Background>
-    <Grid>
-		<materialDesign:DialogHost Name="login_error_dialog"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   IsEnabled="True"
-								   >
-			<materialDesign:DialogHost.DialogContent>
-				<StackPanel Margin="16">
-					<Viewbox Width="48" Height="48">
-						<Canvas Width="24" Height="24">
-							<Path Data="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" Fill="Black" />
-						</Canvas>
-					</Viewbox>
-					<TextBox>Wrong username or password!</TextBox>
-					<Button Style="{StaticResource MaterialDesignFlatButton}"
-							Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"	 
-							Click="Button_Click">
-						OK
-					</Button>
-				</StackPanel>
-			</materialDesign:DialogHost.DialogContent>
-		</materialDesign:DialogHost>
+	<Grid>
 		<materialDesign:Transitioner Name="Transitioner"  SelectedIndex="0" AutoApplyTransitionOrigins="True">
             <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}">
                 <local:LoginPage />
@@ -53,5 +32,6 @@
 				<local:MainPage x:Name="mPage"/>
 			</materialDesign:TransitionerSlide>
         </materialDesign:Transitioner>
+		<materialDesign:Snackbar x:Name="snackbar" MessageQueue="{materialDesign:MessageQueue}"/>
     </Grid>
 </Window>
